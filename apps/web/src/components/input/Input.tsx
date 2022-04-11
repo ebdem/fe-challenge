@@ -13,6 +13,8 @@ const Input = styled.input<Props>`
   background: #FFF;
   border: 2px solid #C3C3C3 ;
   border-radius: 12px;
+  font-size: 14px;
+  font-weight: 700;
   width: ${props => props.width ? props.width : '300px'};
   height: ${props => props.height ? props.height : '50px'};
   margin: ${props => props.margin ? props.margin : '0'};

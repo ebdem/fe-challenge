@@ -1,8 +1,7 @@
 import * as React from "react";
 import styled from "styled-components";
-import { opacify } from "polished";
 import { CSSTransition } from "react-transition-group";
-import { FaWindowClose } from "react-icons/fa";
+import { ModalCloseSVG } from "../../assets/svg/common";
 
 
 interface ModalProps {
@@ -16,7 +15,9 @@ const ModalContainer = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: ${opacify(0.1, "#202020")};
+  width: 100%;
+  height: 100vh;
+  background-color: rgb(51, 51, 51, .7);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -26,12 +27,12 @@ const ModalView = styled.div`
   background-color: #FFFFFF;
   min-width: 400px;
   padding: 2rem;
-  box-shadow: 10px 10px 10px #333333;
   transition: all 300ms ease-out;
-  border-radius: 4px;
+  border-radius: 16px;
   display: flex;
   flex-direction: flex-end;
   flex-direction: column;
+  z-index: 100;
 `;
 
 const ModalCloseButton = styled.button`
@@ -96,9 +97,9 @@ const Modal: React.FC<ModalProps> = ({ visible, children, onClose }) => {
         {state => (
           <ModalContainer>
 
-            <ModalView className="modal-view">
+            <ModalView style={{ background: "#fff", opacity: 1 }} className="modal-view">
               <ModalCloseButton onClick={onClose}>
-                <FaWindowClose />
+                <ModalCloseSVG />
               </ModalCloseButton>
               {children}
             </ModalView>

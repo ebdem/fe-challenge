@@ -1,5 +1,5 @@
 body{
-    font-family: "Montserrat";
+    font-family: 'Montserrat', sans-serif;
 }
 .section1{
     display: flex;
@@ -64,6 +64,8 @@ body{
     max-width: 720px;
     justify-content: space-between;
     margin-bottom: 20px;
+    margin-top: 25px;
+   
 }
 
 .history{
@@ -71,4 +73,22 @@ body{
     max-width: 720px;
     display: flex;
     justify-content: space-between;
+}
+
+.link{
+    text-decoration: none;
+    color: #000;
+}
+
+
+/* Input Date */
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    color: rgba(0, 0, 0, 0);
+    opacity: 1;
+    display: block;
+    background: url("./assets/svg/common/calender.svg") no-repeat;
+    width: 20px;
+    height: 20px;
+    border-width: thin;
 }

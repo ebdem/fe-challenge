@@ -15,16 +15,18 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 textDecoration="none"
                 textTransform="capitalize"
                 fontFamily="Montserrat"
+                margin="30px 0 0 0 "
             >MagicHesap</Text>
             <Text
                 fontSize="16px"
-                fontWeight={400}
+                fontWeight={500}
                 color="#000"
                 textAlign="center"
                 padding="0"
                 textDecoration="none"
                 textTransform="capitalize"
                 fontFamily="Montserrat"
+                margin="0 0 50px 0"
             >Hesap Uzmanı</Text>
             {children}
         </LayoutWrapper>

@@ -9,7 +9,7 @@ export default function IconButton({ icon, title, onClick }: any) {
             border="1px solid #FA4616"
             color="#fff"
             background="#FA4616"
-            padding="0"
+            padding="0 3px"
             height="50px"
             onClick={onClick}
             radius="12px"

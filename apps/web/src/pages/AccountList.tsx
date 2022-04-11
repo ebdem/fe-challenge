@@ -1,22 +1,28 @@
 import * as  React from 'react';
 import { StyledInput } from '../components/input/Input';
 import { Select } from '../components/select/Select';
-import { FaPlus, FaCheck } from "react-icons/fa";
 import IconButton from '../components/iconButton';
 import { Text } from '../components/common';
 import ModalManager from '../components/modal/ModalManager';
 import Modal from '../components/modal/Modal';
-import StyledTable from '../components/table/Table';
+import Table from "../components/table/StyledTable";
 import Layout from '../Layout/Layout';
 import { api } from '../http/axiosInstance';
+import { PlusSVG, CheckSVG } from "../assets/svg/common"
+import Pagination from '../components/pagination/Pagination';
+import { getSlice } from "../components/pagination/getSlice";
 
 
 function AccountList() {
+  const [page, setPage] = React.useState(1);
   const [value, setValue] = React.useState('');
   const [filteredData, setFilteredData] = React.useState([]);
   const [searchText, setSearchText] = React.useState('');
   const [data, setData] = React.useState([]);
   const [selectCurrency, setSelectCurrency] = React.useState('');
+
+  const pagelimit = 6;
+  const { end, start } = getSlice(page, pagelimit);
 
   const search = (e: any) => {
     setSearchText(e.target.value.toLowerCase())
@@ -51,6 +57,8 @@ function AccountList() {
       hideModal();
       setValue('');
       setSelectCurrency('');
+    }).catch((err) => {
+      console.log(err);
     })
   }
 
@@ -72,7 +80,7 @@ function AccountList() {
         <div className='main'>
           <div className='section1'>
             <Text
-              fontSize="24px"
+              fontSize="16px"
               fontWeight={700}
               color="#FA4616"
               textAlign="left"
@@ -83,11 +91,11 @@ function AccountList() {
             >
               Arama
             </Text>
-            <StyledInput type="search" placeholder="Hesap No veya Hesap Adı ile arayın..." value={searchText} onChange={search} />
+            <StyledInput margin="0 17px 0 0" width="351px" type="search" placeholder="Hesap No veya Hesap Adı ile arayın..." value={searchText} onChange={search} />
           </div>
           <div className='section1'>
             <Text
-              fontSize="24px"
+              fontSize="16px"
               fontWeight={700}
               color="#FA4616"
               textAlign="left"
@@ -109,7 +117,7 @@ function AccountList() {
               {({ showModal, hideModal, visible }) => {
                 return (
                   <React.Fragment>
-                    <IconButton icon={<FaPlus />} title="Yeni Hesap" onClick={() => showModal()} />
+                    <IconButton icon={<PlusSVG />} title="Yeni Hesap" onClick={() => showModal()} />
                     <Modal onClose={() => hideModal()} visible={visible}>
                       <div className='modalContent'>
                         <Text
@@ -153,7 +161,7 @@ function AccountList() {
                             >
                               Hesap Tipi
                             </Text>
-                            <Select value={selectCurrency} onChange={handleSelectCurrency} radius='12px' color='#333333' background='#fff' width='170px' height='50px' padding='5px 10px' >
+                            <Select placeholder='Bir Para Birimi Seçiniz' value={selectCurrency} onChange={handleSelectCurrency} radius='12px' color='#333333' background='#fff' width='170px' height='50px' padding='5px 10px' >
                               <option value="GBP">GBP</option>
                               <option value="TRY">TRY</option>
                               <option value="USD">USD</option>
@@ -162,7 +170,7 @@ function AccountList() {
                         </div>
                       </div>
                       <div className='saveButton'>
-                        <IconButton icon={<FaCheck />} title="Yeni Hesap" onClick={(e: any) => handleCreateAccount(e, hideModal)} />
+                        <IconButton icon={<CheckSVG />} title="Kaydet" onClick={(e: any) => handleCreateAccount(e, hideModal)} />
                       </div>
                     </Modal>
                   </React.Fragment>
@@ -172,14 +180,20 @@ function AccountList() {
           </div>
         </div>
         <div className='table'>
-          <StyledTable data={filteredData && filteredData.length > 0 ? filteredData : data} />
-
+          <Table data={filteredData && filteredData.length > 0 ? filteredData.slice(start, end) : data.slice(start, end)} />
         </div>
+        <Pagination
+          page={page}
+          size={data.length}
+          getPage={setPage}
+          limit={pagelimit}
+        />
 
       </Layout>
+
     </div>
 
   );
 }
 
-export default React.memo(AccountList);
+export default AccountList;

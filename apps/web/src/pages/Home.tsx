@@ -8,7 +8,7 @@ import IconButton from '../components/iconButton';
 export default function Home() {
     return (
         <Layout>
-            <Link to="/accounts">
+            <Link className='link' to="/accounts">
                 <IconButton title="Hoşgeldiniz" />
             </Link>
         </Layout>

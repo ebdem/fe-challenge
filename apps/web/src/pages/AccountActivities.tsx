@@ -7,13 +7,14 @@ import { TurkeySVG, BritishSVG, UsaSVG } from "../assets/svg/flags"
 import { TrySVG, DollarSVG, GbtSVG } from "../assets/svg/currency"
 import { Text, Divider } from "../components/common";
 import IconButton from '../components/iconButton';
-import { BiArrowBack } from "react-icons/bi";
-import { FaPlus, FaCheck } from "react-icons/fa";
 import ModalManager from '../components/modal/ModalManager';
 import Modal from '../components/modal/Modal';
 import { StyledInput } from '../components/input/Input';
 import { Select } from '../components/select/Select';
 import { RadioButton, RadioButtonLabel, Item } from '../components/radioButton/RadioButton';
+import Pagination from '../components/pagination/Pagination';
+import { getSlice } from "../components/pagination/getSlice";
+import { PlusSVG, BackArrowSVG, CheckSVG } from "../assets/svg/common"
 
 
 
@@ -23,17 +24,21 @@ type ActivityParams = {
 
 const timeElapsed = Date.now();
 const today = new Date(timeElapsed);
-export default function AccountActivities() {
+function AccountActivities() {
+    const [page, setPage] = React.useState(1);
     const [data, setData] = React.useState([]);
     const [value, setValue] = React.useState(0);
     const [convAmount, setConvAmount] = React.useState(0);
     const [date, setDate] = React.useState(today);
     const [desc, setDesc] = React.useState('');
     const [type, setType] = React.useState('');
-    const [convType, setConvType] = React.useState(0);
     const [selectCurrency, setSelectCurrency] = React.useState('');
     const history = useHistory();
     const { id } = useParams<ActivityParams>();
+
+    const pagelimit = 4;
+
+    const { end, start } = getSlice(page, pagelimit);
     const getAcrtivities = () => {
         api.get(`/activity?accountId=${id}`).then(res => {
 
@@ -69,7 +74,7 @@ export default function AccountActivities() {
             accountId: parseInt(id),
             description: desc,
             amount: convAmount,
-            type: convType,
+            type: handleRadio(type),
             createdAt: date.toISOString()
         }).then(() => {
             getAcrtivities();
@@ -77,12 +82,24 @@ export default function AccountActivities() {
             setValue(0);
             setDesc('');
             setSelectCurrency('');
+            setType('');
+        }).catch((err) => {
+            console.log(err);
         })
 
     }
 
+    const handleRadio = (typ: any) => {
+        if (typ === '0') {
+            return 0
+        }
+        if (typ === '1') {
+            return 1
+        }
+        return 1
+    }
+
     const handleDateChange = (e: any) => {
-        e.preventDefault();
         const timeElapsed = e.target.valueAsNumber;
         const today = new Date(timeElapsed);
         setDate(today);
@@ -97,11 +114,7 @@ export default function AccountActivities() {
     }
 
     const handleSelectType = (e: any) => {
-        e.preventDefault();
-        const conv = e.target.value
         setType(e.target.value);
-        setConvType(parseInt(conv));
-
 
     }
 
@@ -109,14 +122,14 @@ export default function AccountActivities() {
         const info = localStorage.getItem('item');
         const data = JSON.parse(info);
 
-        if (data.currency === 'TRY') {
+        if (data?.currency === 'TRY') {
             return <TurkeySVG />;
         }
-        if (data.currency === 'GBP') {
+        if (data?.currency === 'GBP') {
             return <BritishSVG />;
         }
 
-        if (data.currency === 'USD') {
+        if (data?.currency === 'USD') {
             return <UsaSVG />;
         }
         return TurkeySVG;
@@ -126,21 +139,21 @@ export default function AccountActivities() {
     const handleName = () => {
         const info = localStorage.getItem('item');
         const data = JSON.parse(info);
-        return data.name;
+        return data?.name;
     }
 
     const selectSign = () => {
         const info = localStorage.getItem('item');
         const data = JSON.parse(info);
 
-        if (data.currency === 'TRY') {
+        if (data?.currency === 'TRY') {
             return <div>{data.accountNumber + " " + "-" + " "}Türk Lirası (<TrySVG />)</div>;
         }
-        if (data.currency === 'GBP') {
+        if (data?.currency === 'GBP') {
             return <div>{data.accountNumber + " " + "-" + " "}Sterlin (<GbtSVG />)</div>;
         }
 
-        if (data.currency === 'USD') {
+        if (data?.currency === 'USD') {
             return <div>{data.accountNumber + " " + "-" + " "}Dolar (<DollarSVG />)</div>;
         }
         return TurkeySVG;
@@ -157,8 +170,8 @@ export default function AccountActivities() {
                     return (
                         <React.Fragment>
                             <div className='activityButtons'>
-                                <IconButton icon={<BiArrowBack />} title="Ana Sayfa" onClick={() => history.push("/accounts")} />
-                                <IconButton icon={<FaPlus />} title="Yeni Hesap" onClick={() => showModal()} />
+                                <IconButton icon={<BackArrowSVG />} title="Ana Sayfa" onClick={() => history.push("/accounts")} />
+                                <IconButton icon={<PlusSVG />} title="Yeni Hesap" onClick={() => showModal()} />
                             </div>
 
                             <Modal onClose={() => hideModal()} visible={visible}>
@@ -204,7 +217,7 @@ export default function AccountActivities() {
                                             >
                                                 Kategori
                                             </Text>
-                                            <Select value={selectCurrency} onChange={handleSelectCurrency} radius='12px' color='#333333' background='#fff' width='170px' height='50px' padding='5px 10px' >
+                                            <Select defaultValue="TRY" value={selectCurrency} onChange={handleSelectCurrency} radius='12px' color='#333333' background='#fff' width='170px' height='50px' padding='5px 10px' >
                                                 <option value="GBP">GBP</option>
                                                 <option value="TRY">TRY</option>
                                                 <option value="USD">USD</option>
@@ -283,7 +296,7 @@ export default function AccountActivities() {
                                     </div>
                                 </div>
                                 <div className='saveButton'>
-                                    <IconButton icon={<FaCheck />} title="Yeni Hesap" onClick={(e: any) => handleCreateActivity(e, hideModal)} />
+                                    <IconButton icon={<CheckSVG />} title="Kaydet" onClick={(e: any) => handleCreateActivity(e, hideModal)} />
                                 </div>
                             </Modal>
                         </React.Fragment>
@@ -308,13 +321,14 @@ export default function AccountActivities() {
                     >{handleName()}</Text>
                     <Text
                         fontSize="16px"
-                        fontWeight={700}
+                        fontWeight={500}
                         color="#000"
                         textAlign="left"
                         padding="0 0 0 10px"
                         textDecoration="none"
                         textTransform="capitalize"
                         fontFamily="Montserrat"
+
                     > {selectSign()}</Text>
 
                 </div>
@@ -322,19 +336,20 @@ export default function AccountActivities() {
             <div className='activityButtons'>
                 <Text
                     fontSize="16px"
-                    fontWeight={700}
+                    fontWeight={500}
                     color="#FA4616"
                     textAlign="left"
                     padding="0"
                     textDecoration="none"
                     textTransform="capitalize"
                     fontFamily="Montserrat"
+                    margin="10px 0 0 0 "
                 >
                     Hesap Hareketleri
                 </Text>
                 <Text
                     fontSize="16px"
-                    fontWeight={700}
+                    fontWeight={500}
                     color="#000"
                     textAlign="left"
                     padding="0"
@@ -346,7 +361,7 @@ export default function AccountActivities() {
                 </Text>
             </div>
             <div>
-                {data.map((item) => {
+                {data.slice(start, end).map((item) => {
 
                     const year = item.createdAt.toString().substring(0, 4);
                     const day = item.createdAt.toString().substring(8, 10);
@@ -357,34 +372,38 @@ export default function AccountActivities() {
                     const amount = () => {
                         if (item.type === 0) {
                             return (
+                                <div style={{ width: "75px" }}>
+                                    <Text
+                                        fontSize="16px"
+                                        fontWeight={500}
+                                        color="#FA4616"
+                                        textAlign="left"
+                                        padding="0"
+                                        textDecoration="none"
+                                        textTransform="capitalize"
+                                        fontFamily="Montserrat"
+                                    >
+                                        - {item.amount}
+                                    </Text>
+                                </div>
+                            )
+                        }
+
+                        return (
+                            <div style={{ width: "75px" }}>
                                 <Text
                                     fontSize="16px"
                                     fontWeight={500}
-                                    color="#FA4616"
+                                    color="#008000"
                                     textAlign="left"
                                     padding="0"
                                     textDecoration="none"
                                     textTransform="capitalize"
                                     fontFamily="Montserrat"
                                 >
-                                    - {item.amount}
+                                    + {item.amount}
                                 </Text>
-                            )
-                        }
-
-                        return (
-                            <Text
-                                fontSize="16px"
-                                fontWeight={500}
-                                color="#008000"
-                                textAlign="left"
-                                padding="0"
-                                textDecoration="none"
-                                textTransform="capitalize"
-                                fontFamily="Montserrat"
-                            >
-                                + {item.amount}
-                            </Text>
+                            </div>
                         )
                     }
 
@@ -397,32 +416,50 @@ export default function AccountActivities() {
                                 <div style={{
                                     display: "flex",
                                     width: "630px",
+
                                 }}>
 
-                                    <Text
-                                        fontSize="16px"
-                                        fontWeight={500}
-                                        color="#000"
-                                        textAlign="left"
-                                        padding="0"
-                                        textDecoration="none"
-                                        textTransform="capitalize"
-                                        fontFamily="Montserrat"
-                                    >
-                                        {da}/{mo}
-                                    </Text>
+                                    <div style={{
+                                        borderRight: "1px solid #ccc",
+
+                                    }}>
+                                        <Text
+                                            fontSize="16px"
+                                            fontWeight={600}
+                                            color="#000"
+                                            textAlign="left"
+                                            padding="0 10px"
+                                            textDecoration="none"
+                                            textTransform="capitalize"
+                                            fontFamily="Montserrat"
+                                            margin="10px 20px  "
+                                        >
+                                            {da}<br />{mo}
+                                        </Text>
+                                    </div>
 
                                     <Text
                                         fontSize="16px"
-                                        fontWeight={500}
+                                        fontWeight={600}
                                         color="#000"
-                                        textAlign="left"
                                         padding="0"
                                         textDecoration="none"
                                         textTransform="capitalize"
                                         fontFamily="Montserrat"
+                                        margin='auto 0 auto 10px'
                                     >
-                                        {item.description}
+                                        {item.description} <br />
+                                        <Text
+                                            fontSize="16px"
+                                            fontWeight={500}
+                                            color="#636363"
+                                            padding="0"
+                                            textAlign='left'
+                                            textDecoration="none"
+                                            textTransform="capitalize"
+                                            fontFamily="Montserrat"
+                                            margin='3px 0 0 0'
+                                        >Market</Text>
                                     </Text>
                                 </div>
                                 <Text
@@ -438,11 +475,21 @@ export default function AccountActivities() {
                                     {amount()}
                                 </Text>
                             </div>
+
                         </div>
                         )
                     )
                 })}
+
             </div >
+            <Pagination
+                page={page}
+                size={data.length}
+                getPage={setPage}
+                limit={pagelimit}
+            />
         </Layout >
     )
 }
+
+export default AccountActivities;

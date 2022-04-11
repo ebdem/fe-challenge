@@ -19,6 +19,7 @@ export const Select = styled.select<Props>`
   font-size: 14px;
   border: 2px solid #C3C3C3;
   margin-left: 10px;
+  margin-right: 10px;
 
   option {
     color: black;
